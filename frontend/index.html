@@ -20,6 +20,7 @@
     <a class="brand" href="#top"><span class="orb" aria-hidden="true"></span><span>Feedback Analyser</span></a>
     <div class="navlinks">
       <a href="#proof">What it answers</a>
+      <a href="#serp">SerpApi</a>
       <a href="#how">How it works</a>
       <a href="#demo">Workspace</a>
       <a href="#roi">Cost</a>
@@ -37,7 +38,7 @@
       <div class="tile clay b-copy">
         <p class="kicker">Customer feedback analyser · powered by <b>SerpApi</b> live search data</p>
         <h1 class="display">Feedback that <em>remembers.</em></h1>
-        <p class="lede">Give it a business name and a location. SerpApi pulls the live public reviews straight from Google Maps, Google Play and the App Store, then it throws away the junk, groups what's left into themes and scores each one from −5 to +5 with a reason and a next step. Every run is remembered, so the next one can say what got better and what got worse.</p>
+        <p class="lede">Give it a business name and a location. SerpApi pulls the live Google Maps reviews, then it throws away the junk, groups what's left into themes and scores each one from −5 to +5 with a reason and a next step. Every run is remembered, so the next one can say what got better and what got worse.</p>
         <div class="hero-ctas">
           <a class="btn primary" href="#demo" data-focus-form><span data-ic="spark"></span>Analyse a business</a>
           <a class="link" href="#proof">See the three questions it answers <span data-ic="arrow"></span></a>
@@ -113,6 +114,39 @@
     </div>
   </section>
 
+  <!-- SERPAPI BENTO: head 7 · stat 5 | three feature tiles of 4 | flow 12 -->
+  <section class="sec wrap" id="serp">
+    <div class="bento">
+      <div class="tile plain sp-head">
+        <p class="kicker">Powered by SerpApi</p>
+        <h2 class="h2">No data, no analysis. <em>SerpApi is the data.</em></h2>
+        <p class="lede">Google gives you no review export. SerpApi turns a Maps listing into clean, paginated JSON, so the analyser starts from hundreds of fresh, real reviews instead of a pasted sample.</p>
+      </div>
+      <div class="tile clay sp-stat">
+        <div class="bigstat"><b>~588</b><span>reviews with text from one run, in at most 30 SerpApi searches</span></div>
+        <div class="src-list"><span class="src">newest first</span><span class="src">most relevant</span><span class="src">highest</span><span class="src">lowest</span></div>
+      </div>
+      <article class="tile clay-sm sp-f">
+        <span class="n">01 · Find</span>
+        <h3 class="h3">Name in, <em>place out.</em></h3>
+        <p class="body">Type a business and a city. One search resolves the exact Maps listing, with its rating, address and review count.</p>
+      </article>
+      <article class="tile clay-sm sp-f">
+        <span class="n">02 · Read</span>
+        <h3 class="h3">Pages of <em>real reviews.</em></h3>
+        <p class="body">It walks the review pages, 8 on the first and 20 on each after, and stops at your age limit, so you read this quarter's customers and not 2019's.</p>
+      </article>
+      <article class="tile clay-sm sp-f">
+        <span class="n">03 · Compare</span>
+        <h3 class="h3">Rivals, <em>one search away.</em></h3>
+        <p class="body">One extra search finds nearby competitors, so every theme can be set against what their customers praise and complain about.</p>
+      </article>
+      <div class="tile well sp-flow" aria-label="From SerpApi to a decision">
+        <span class="src">SerpApi search</span><i aria-hidden="true">→</i><span class="src">reviews as JSON</span><i aria-hidden="true">→</i><span class="src">Checker drops the junk</span><i aria-hidden="true">→</i><span class="src">scored themes</span><i aria-hidden="true">→</i><span class="src">what to fix on Monday</span>
+      </div>
+    </div>
+  </section>
+
   <!-- HOW BENTO: heading 6 | stage 3 | stage 3 · three stages of 4 · memory verbs 12 -->
   <section class="sec wrap" id="how">
     <div class="bento">
@@ -162,7 +196,6 @@
             <span class="grow"></span>
             <div class="segctl well" role="group" aria-label="Review provider" data-for="shop">
               <button type="button" data-provider="serpapi" aria-pressed="true">SerpApi</button>
-              <button type="button" data-provider="places" aria-pressed="false">Google Places · max 5</button>
             </div>
             <label class="tick" data-for="shop"><input type="checkbox" id="fStore" checked><span>Remember this run</span></label>
             <label class="tick" title="Also read what customers say about similar places nearby, so each theme is scored against the local market"><input type="checkbox" id="fCompare" checked><span>Compare with competitors</span></label>

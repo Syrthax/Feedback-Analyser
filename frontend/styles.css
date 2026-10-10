@@ -556,6 +556,13 @@ button.tag:hover{transform:translateY(-1px)}
 .step.tile .blob{width:64px;height:64px}
 .step.tile .m{padding-top:6px}
 .step.key{background:color-mix(in srgb,var(--blue-soft) 34%,var(--surface-hi))}
+.sp-head{--c:7}
+.sp-head .lede{margin-top:6px;max-width:56ch}
+.sp-stat{--c:5;align-content:space-between}
+.sp-f{--c:4}
+.sp-f .n{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.sp-flow{--c:12;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px 14px}
+.sp-flow i{font-style:normal;color:var(--ink-2)}
 .b-verbs{margin-top:0;border-radius:38px;gap:28px 56px;align-items:center}
 
 /* demo tray bento */
@@ -606,6 +613,8 @@ button.tag:hover{transform:translateY(-1px)}
   .p-a{--c:12;--r:1}
   .p-b,.p-c,.p-d,.p-e{--c:6}
   .h-head{--c:12}
+  .sp-head,.sp-stat{--c:12}
+  .sp-f{--c:6}
   .rail-b > li{--c:4}
   .t-brief,.t-kpis{--c:12}
   .t-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -785,3 +794,5 @@ button.belief:hover{transform:translateY(-2px)}
 .mkt-list.bad{--dot:var(--orange)}
 .mkt-list q{grid-column:2;font-size:12.5px;color:var(--ink-3)}
 .market .empty{color:var(--ink-3);font-size:14px}
+
+@media (max-width:640px){.sp-f{--c:12}}

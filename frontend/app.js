@@ -635,6 +635,7 @@ function setMode(m){
   msg('');
 }
 function setProvider(p){
+  p = 'serpapi'; // the Google Places option was removed; old saved runs may still say 'places'
   state.provider = p;
   $$('[data-provider]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.provider === p)));
 }
@@ -1226,7 +1227,7 @@ const links = [...document.querySelectorAll('.navlinks a')];
 const secObs = new IntersectionObserver(es => es.forEach(en => {
   if (en.isIntersecting) links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id));
 }), {rootMargin:'-45% 0px -50% 0px'});
-['proof','how','demo','roi','pilot'].forEach(id => secObs.observe(document.getElementById(id)));
+['proof','serp','how','demo','roi','pilot'].forEach(id => secObs.observe(document.getElementById(id)));
 
 /* hero tiles settle, then hover lift takes over */
 $('#stack').querySelectorAll('.mcard').forEach(c => c.addEventListener('animationend', () => c.classList.remove('drop'), {once:true}));
