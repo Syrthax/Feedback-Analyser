@@ -11,7 +11,7 @@ any_strict, which also excludes the older untagged memories.
 Memory is an enhancement, not a dependency: if Hindsight is down or its key is
 missing, the analysis still runs -- the Analyst just gets no past context and
 nothing is stored. `error` says why, for the caller to surface as a warning.
-It used to raise, after SerpApi and Groq had already been paid for."""
+It used to raise, after SerpApi and the AI calls had already been paid for."""
 
 import hashlib
 import json
@@ -101,7 +101,7 @@ class HindsightMemory:
         Storing the same key again REPLACES the earlier memory, so re-running a
         week no longer stacks duplicates that read as "3 runs straight".
 
-        Themes the Analyst couldn't really score (degraded: Groq down, or an
+        Themes the Analyst couldn't really score (degraded: Featherless down, or an
         unparseable reply) are left out -- stored, their placeholder 0 came back
         on the next run as a genuine past trend. Returns False, storing nothing,
         when no theme was really scored."""

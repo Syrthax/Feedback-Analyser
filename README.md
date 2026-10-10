@@ -48,12 +48,12 @@ swapped without touching the others.
  └─────────────┘
         │  verified reviews + a rejected count
         ▼
- ┌─────────────┐   one Groq call: reads a sample, returns recurring
+ ┌─────────────┐   one AI call: reads a sample, returns recurring
  │   SCORER    │   themes with a name, mention count and quotes
  └─────────────┘
         │  [{name, count, samples}]
         ▼
- ┌─────────────┐   one Groq call per theme, plus recall of past runs
+ ┌─────────────┐   one AI call per theme, plus recall of past runs
  │   ANALYST   │   → score −5..+5, reasoning, next_step
  └─────────────┘
         │
@@ -67,8 +67,8 @@ swapped without touching the others.
 |---|---|---|
 | Gatherer | `backend/gatherer/` | Pulls reviews from a shop (Google Maps), an app (Play/App Store) or a CSV into one table |
 | Checker | `backend/checker.py` | Rule-based filter. No LLM — deterministic and free |
-| Scorer | `backend/scorer.py` | Groq groups reviews into themes with counts and quotes |
-| Analyst | `backend/analyst.py` | Groq scores each theme −5..+5 with reasoning, using past runs |
+| Scorer | `backend/scorer.py` | The LLM groups reviews into themes with counts and quotes |
+| Analyst | `backend/analyst.py` | The LLM scores each theme −5..+5 with reasoning, using past runs |
 | Memory | `backend/memory.py` | Hindsight Cloud — semantic recall across runs |
 | API | `backend/api.py` | FastAPI wrapper for the mobile app |
 
@@ -107,7 +107,8 @@ pip install -r requirements.txt
 Copy `.env.example` to `.env` in the repo root and fill it in:
 
 ```ini
-GROQ_API_KEY=          # required — console.groq.com
+FEATHERLESS_API_KEY=   # required — featherless.ai (Premium plan for the default 72B model)
+FEATHERLESS_MODEL=     # optional — defaults to Qwen/Qwen2.5-72B-Instruct
 HINDSIGHT_API_KEY=     # required — hindsight.vectorize.io
 SERPAPI_API_KEY=       # for shop reviews — serpapi.com (250 free searches/month)
 GOOGLE_MAPS_API_KEY=   # alternative to SerpApi (capped at 5 reviews per shop)
@@ -267,7 +268,7 @@ curl -X POST http://localhost:8000/shops/analyse \
 With `compare` on, the run finds competitors (one SerpApi search, busiest
 first; places sharing the business's name are skipped as other branches),
 reads up to 60 of each one's newest reviews through the Checker, and makes
-**one** Groq call for every competitor's strengths and weaknesses. The Analyst
+**one** AI call for every competitor's strengths and weaknesses. The Analyst
 gets that summary with every theme, so its `reasoning`, `next_step` and
 `vs_competitors` can weigh the theme against the local market. Competitor
 reviews are never mixed into the business's own themes. Finding competitors
@@ -305,9 +306,9 @@ business's past runs (shops are keyed by name + location).
 | `themes[].next_step` | string | What to do. A paragraph |
 | `warnings` | string[] | Non-fatal problems: review fetching stopped early, Hindsight down, themes that couldn't be scored. Show them as a banner; the result is still usable |
 | `stored` | bool | `true` only if Hindsight actually kept this run (false when `store` was off, Hindsight failed, or no theme was really scored) |
-| `themes[].degraded` | bool | `true` = not a real score (Groq unavailable or an unusable reply); its `0` is a placeholder |
+| `themes[].degraded` | bool | `true` = not a real score (Featherless AI unavailable or an unusable reply); its `0` is a placeholder |
 | `themes[].vs_competitors` | string | How the theme compares with the local market. `""` without `compare`, or when no competitor relates to it |
-| `market` | object \| null | `null` without `compare`. `competitors[]`: `name`, `address`, `rating`, `review_count`, `reviews_used`, `strengths[]` / `weaknesses[]` (`point`, `evidence` quote), `degraded` (`true` = Groq didn't summarise it). `discovered`: found nearby rather than named |
+| `market` | object \| null | `null` without `compare`. `competitors[]`: `name`, `address`, `rating`, `review_count`, `reviews_used`, `strengths[]` / `weaknesses[]` (`point`, `evidence` quote), `degraded` (`true` = Featherless AI didn't summarise it). `discovered`: found nearby rather than named |
 
 `themes` comes back unsorted — sort by `score` in the client. Split at zero for
 a two-column "Fix these / Protect these" layout.
@@ -320,7 +321,7 @@ Every error is JSON: `{"detail": "<human-readable reason>", "error": "<kind>"}`.
 |---|---|---|---|
 | `404` | `NothingToAnalyse` | Business not found, or every review was filtered out | "Couldn't find reviews for that business — try adding the city" |
 | `422` | — | Bad request body (e.g. `months: 999`, empty `name`) | Field validation. `detail[0].msg` has the reason |
-| `502` | `UpstreamError` | SerpApi / Places / Groq failed, or a rate limit | "Couldn't analyse right now, try again shortly" — retriable |
+| `502` | `UpstreamError` | SerpApi / Places / Featherless AI failed, or a rate limit | "Couldn't analyse right now, try again shortly" — retriable |
 | `503` | `ConfigError` | The server is missing an API key | "Service unavailable" — not retriable until the server is fixed |
 | `500` | `InternalError` | A bug | Generic error; the server log has the traceback |
 
@@ -330,7 +331,7 @@ trends and says so in `warnings`.
 ### ⚠ These endpoints are slow — plan for it
 
 **60–120 seconds is normal**, and the request is synchronous. It scrapes
-reviews, then makes one Groq call *per theme*. A measured run took 27s for 6
+reviews, then makes one AI call *per theme*. A measured run took 27s for 6
 themes; a bigger one took 89s.
 
 For a mobile client:
@@ -341,7 +342,7 @@ For a mobile client:
   Scoring themes…" — or it reads as frozen.
 - **Don't fire it on every keystroke.** One call per explicit search.
 - **Cache by `(name, location, limit, months)`.** Re-running the same business costs
-  real money in Groq tokens and SerpApi searches.
+  real money in Featherless AI usage and SerpApi searches.
 
 If this becomes a problem, the fix is a job queue: `POST` returns a job id
 immediately and the client polls. Not built yet.
@@ -383,7 +384,7 @@ Every run spends real quota, on three services:
 
 | Service | Free tier | Per run |
 |---|---|---|
-| Groq | 200,000 tokens/day | 1 call for themes + 1 per theme (~7–9 total), +1 for competitors with `compare` |
+| Featherless AI | flat monthly plan; no token cap, limited concurrent requests (a 72B model uses 4 units) | 1 call for themes + 1 per theme (~7–9 total), +1 for competitors with `compare` |
 | SerpApi | 250 searches/month | ~1 search per 20 reviews: up to 30 for the default 400 (fewer for small shops). `compare` adds up to 13: 1 to find competitors + at most 4 per competitor |
 | Hindsight | — | 1 store + 1 recall per theme |
 
@@ -397,7 +398,7 @@ sample, not across all of them.
 At the 400-review default a busy shop can use 30 SerpApi searches, about 8 runs
 on the free tier. Pass a smaller `limit` (200 ≈ 11 searches) to stretch it.
 
-**If Groq's daily quota runs out**, the Analyst returns `score: 0` with
+**If Featherless AI is down or rate limited**, the Analyst returns `score: 0` with
 `reasoning: "LLM unavailable, defaulted to neutral."` and `degraded: true`. The
 HTTP call still succeeds with a `200`. The CLI flags these as `⚠ NOT A REAL
 SCORE` — a client should check `degraded` rather than render six confident
@@ -427,7 +428,7 @@ backend/
   analyst.py           LLM scoring + reasoning
   market.py            similar-market scan: find competitors, summarise their reviews
   memory.py            Hindsight store / recall
-  llm.py               shared Groq helper: retries, rate-limit backoff, fallbacks
+  llm.py               shared Featherless AI helper: retries, rate-limit backoff, fallbacks
   config.py            key loading (env → keys.csv)
 frontend/              dashboard served by api.py at /
 data/cleaned/          gathered reviews (gitignored)

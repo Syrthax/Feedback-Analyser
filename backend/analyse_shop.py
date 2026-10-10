@@ -83,13 +83,13 @@ def analyse_shop(name: str, location: str, provider: str = "serpapi", limit: int
     say(f"\n{'=' * WIDTH}\n  {name} — {location}\n{'=' * WIDTH}")
 
     # 0. PREFLIGHT ----------------------------------------------------------
-    # Check keys before gathering: a missing Groq key used to surface only at
+    # Check keys before gathering: a missing Featherless key used to surface only at
     # step 3, after up to max_pages billable SerpApi searches were spent.
     since = (date.today() - timedelta(days=round(months * 30.44))).isoformat() if months else None
     source = REGISTRY["shop"](name=name, location=location, provider=provider, limit=limit,
                               max_pages=max_pages, since=since)
-    if not get_key("GROQ_API_KEY"):
-        raise ConfigError("GROQ_API_KEY is not set -- see .env.example, or add it to keys.csv.")
+    if not get_key("FEATHERLESS_API_KEY"):
+        raise ConfigError("FEATHERLESS_API_KEY is not set -- see .env.example, or add it to keys.csv.")
     try:
         source._key()
     except RuntimeError as e:
@@ -150,7 +150,7 @@ def analyse_shop(name: str, location: str, provider: str = "serpapi", limit: int
     if not themes:
         # empty is ambiguous: genuinely no pattern, or a silently failed LLM call
         raise UpstreamError(f"The Scorer found no themes in {len(verified)} verified reviews. "
-                            f"Usually means the Groq call failed or hit a rate limit.")
+                            f"Usually means the Featherless AI call failed or hit a rate limit.")
     say(f"      found    : {len(themes)} themes across {len(verified)} verified reviews")
     for t in themes:
         say(f"                 {t['name'][:46]:<46} {t['count']:>4} mentions")
@@ -190,7 +190,7 @@ def analyse_shop(name: str, location: str, provider: str = "serpapi", limit: int
             warn(f"{memory.error}; scored without past-run trends, and this run isn't stored.")
 
         for t in sorted(analyzed, key=lambda t: t["score"]):
-            # degraded = Groq unavailable or an unusable reply: its 0 is a
+            # degraded = Featherless unavailable or an unusable reply: its 0 is a
             # placeholder, so say so loudly instead of passing it off as neutral
             flag = "  ⚠ NOT A REAL SCORE" if t["degraded"] else ""
             say(f"  {t['score']:+d}   {t['name']}   ({t['count']} mentions){flag}")
@@ -231,8 +231,8 @@ def analyse_shop(name: str, location: str, provider: str = "serpapi", limit: int
         say(wrap(best["next_step"], "                   "))
     if degraded:
         warnings.append(f"{len(degraded)} of {len(analyzed)} themes could not be scored "
-                        f"(Groq unavailable, rate limited, or an unusable reply); see themes[].degraded.")
-        say(f"\n      ⚠ {len(degraded)} of {len(analyzed)} themes could NOT be scored — Groq was "
+                        f"(Featherless AI unavailable, rate limited, or an unusable reply); see themes[].degraded.")
+        say(f"\n      ⚠ {len(degraded)} of {len(analyzed)} themes could NOT be scored — Featherless was "
               f"unavailable, rate\n        limited, or replied unusably. Those show +0 but are not real results.")
     say("")
     return result

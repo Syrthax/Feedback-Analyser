@@ -1,5 +1,5 @@
 hindsight-client
-groq
+openai
 certifi
 fastapi
 uvicorn[standard]

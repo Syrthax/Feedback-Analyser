@@ -54,7 +54,7 @@ FALLBACK = json.dumps(
     {
         "score": 0,
         "reasoning": "LLM unavailable, defaulted to neutral.",
-        "next_step": "Retry analysis once Groq is reachable.",
+        "next_step": "Retry analysis once Featherless AI is reachable.",
         "vs_competitors": "",
     }
 )

@@ -96,7 +96,7 @@ def run_week(week_number: int, business: str | None = None, compare: bool = Fals
     if not themes:
         # empty is ambiguous (see analyse_shop.py) -- never store it as a real week
         raise UpstreamError(f"the Scorer found no themes in {len(verified)} verified reviews; "
-                           f"usually means the Groq call failed or hit a rate limit")
+                           f"usually means the Featherless AI call failed or hit a rate limit")
 
     warnings, market = [], None
     if compare:

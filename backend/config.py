@@ -4,7 +4,7 @@ from pathlib import Path
 
 KEYS_CSV = Path(__file__).resolve().parent.parent / "keys.csv"
 
-REQUIRED_KEYS = ["GROQ_API_KEY", "HINDSIGHT_API_KEY"]
+REQUIRED_KEYS = ["FEATHERLESS_API_KEY", "HINDSIGHT_API_KEY"]
 
 
 def _csv_keys() -> dict:

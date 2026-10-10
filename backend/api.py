@@ -6,7 +6,7 @@ analyze -> store):
   POST /shops/analyse      one business by name + location (the app's main flow)
   POST /weeks/{n}/run      one ISO week of whatever the Gatherer last collected
 
-Both are slow by design -- they scrape reviews and then make one Groq call per
+Both are slow by design -- they scrape reviews and then make one AI call per
 theme, so 60-120s is normal. See README.md for how a mobile client should
 handle that.
 

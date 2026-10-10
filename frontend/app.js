@@ -136,7 +136,7 @@ function saveHistory(){
 }
 
 /* ---------- backend contract ---------- */
-// themes[].degraded marks a placeholder 0 (Groq unavailable or an unusable reply);
+// themes[].degraded marks a placeholder 0 (Featherless AI unavailable or an unusable reply);
 // the text check covers servers from before that flag existed
 const FALLBACK_RE = /LLM unavailable|Could not parse structured output/i;
 // defaults for servers from before /health reported them; checkHealth() replaces both
@@ -416,7 +416,7 @@ function scoreChart(themes, selId, demo){
   themes.forEach((t,i) => {
     const yc = T + i*rowH + rowH/2, g = demo ? SIG[t.sig] : sig(t), w = Math.max(3, Math.abs(t.score)*unit), x = t.score < 0 ? mid - w : mid, sel = t.id && t.id === selId;
     s += `<g${demo ? '' : ` data-go="${esc(t.id)}"`} style="--hue:${g.c}"><rect class="hit" x="0" y="${yc - rowH/2}" width="${W}" height="${rowH}"/>`
-      + `<title>${esc(t.name)}: ${sgn(t.score)}${t.count != null ? `, ${t.count} mentions` : ''}${t.fallback ? ' (not a real score: Groq was unavailable)' : ''}</title>`
+      + `<title>${esc(t.name)}: ${sgn(t.score)}${t.count != null ? `, ${t.count} mentions` : ''}${t.fallback ? ' (not a real score: Featherless AI was unavailable)' : ''}</title>`
       + `<text class="name${sel ? ' cur' : ''}" x="${L-14}" y="${yc+4}" text-anchor="end">${esc(trunc(t.name + (t.fallback ? ' ⚠' : ''), 31))}</text>`
       + `<rect class="bar${sel ? ' sel' : ''}" x="${x.toFixed(1)}" y="${yc-10}" width="${w.toFixed(1)}" height="20" rx="7"/>`
       + (w > 30 ? `<rect class="shine" x="${(x+5).toFixed(1)}" y="${yc-6}" width="${Math.min(w*.3, 40).toFixed(1)}" height="5" rx="2.5" pointer-events="none"/>` : '')
@@ -561,8 +561,8 @@ function renderRail(){
   const S = [
     {ic:'inbox', b:'Gather', s:'Pulls reviews from Google Maps, Google Play, the App Store or a CSV into one table.', m: R ? (R.gathered != null ? `${fmt(R.gathered)} reviews · ${fmtPeriod(R.period)}` : fmtPeriod(R.period)) : 'newest 400 reviews by default'},
     {ic:'filter', b:'Check', s:'Rule-based, no LLM: duplicates, under 4 words, repeated-phrase spam and gibberish.', m: R ? `${fmt(R.rejected_count)} filtered out${R.verified != null ? ` · ${fmt(R.verified)} kept` : ''}` : '4 rules · costs nothing'},
-    {ic:'cluster', b:'Find themes', s:`One Groq call reads a random sample of ${SAMPLE_SIZE} verified reviews and returns recurring themes with mention counts and quotes.`, m: R ? `${plural(R.themes.length, 'theme')} found` : '1 Groq call'},
-    {ic:'gauge', b:'Score + explain', s:'One Groq call per theme scores it from −5 to +5 and writes the reason and the next step, using what memory recalls.', m: R ? `worst ${worst ? sgn(worst.score) : '—'} · best ${best ? sgn(best.score) : '—'}` : '1 Groq call per theme', key:true},
+    {ic:'cluster', b:'Find themes', s:`One AI call reads a random sample of ${SAMPLE_SIZE} verified reviews and returns recurring themes with mention counts and quotes.`, m: R ? `${plural(R.themes.length, 'theme')} found` : '1 AI call'},
+    {ic:'gauge', b:'Score + explain', s:'One AI call per theme scores it from −5 to +5 and writes the reason and the next step, using what memory recalls.', m: R ? `worst ${worst ? sgn(worst.score) : '—'} · best ${best ? sgn(best.score) : '—'}` : '1 AI call per theme', key:true},
     {ic:'brain', b:'Remember', s:"Hindsight stores the run under the business's tag, so the next run can recall it.", m: R ? (rec.stored ? `stored as week:${rec.run}` : 'not stored: memory was off') : 'retain + recall', key:true}
   ];
   $('#rail').innerHTML = S.map((s,k) => `<li class="step tile clay-sm${s.key?' key':''}"><span class="blob">${ic(s.ic)}</span><span class="n">stage ${k+1}</span><h3>${s.b}</h3><p>${s.s}</p><span class="m">${esc(s.m)}</span></li>`).join('');
@@ -703,7 +703,7 @@ function renderRecent(){
 function headlineFor(rec){
   const R = rec.r, T = R.themes, real = realThemes(R), worst = worstOf(R), best = bestOf(R);
   if (!T.length) return 'No themes came back for this run.';
-  if (!real.length) return `Groq was unavailable, so none of the ${T.length} themes got a real score. Run again once it's reachable.`;
+  if (!real.length) return `Featherless AI was unavailable, so none of the ${T.length} themes got a real score. Run again once it's reachable.`;
   const parts = [];
   if (worst) parts.push(`“${worst.name}” is the ${worst.score === -5 ? 'one to fix before anything else' : 'most urgent problem'} (${sgn(worst.score)}).`);
   if (best) parts.push(`“${best.name}” is the strength to protect (${sgn(best.score)}).`);
@@ -728,7 +728,7 @@ function renderBriefing(typed){
   $('#warns').hidden = !R.warnings.length;
   $('#warns').innerHTML = R.warnings.map(w => `<p class="memo well warn"><span class="kicker"><i></i>Warning · the result is still usable</span><span>${esc(w)}</span></p>`).join('');
   $('#hls').innerHTML = [...neg, ...pos].map(chip).join('')
-    + (failed.length ? `<button class="hl clay-sm" data-go="${esc(failed[0].id)}"><span class="blob" style="--c:var(--orange-soft)">${ic('alert')}</span><span>${failed.length} of ${R.themes.length} not scored: Groq unavailable</span></button>` : '')
+    + (failed.length ? `<button class="hl clay-sm" data-go="${esc(failed[0].id)}"><span class="blob" style="--c:var(--orange-soft)">${ic('alert')}</span><span>${failed.length} of ${R.themes.length} not scored: Featherless AI unavailable</span></button>` : '')
     || `<p class="empty">No themes came back.</p>`;
 }
 function showRunError(lines){
@@ -806,7 +806,7 @@ function renderThemes(){
 /* ---------- detail ---------- */
 function verdict(t, R){
   const V = (sg, icn, title, body, ba) => `<span class="blob" style="--c:${SIG[sg].soft}">${ic(icn)}</span><div><h4>${esc(title)}</h4><p>${esc(body)}</p>${ba ? `<div class="ba">${ba}</div>` : ''}</div>`;
-  if (t.fallback) return V('alert', 'alert', 'Not a real score', "Groq was unavailable or rate limited, so the Analyst defaulted this theme to 0. Run again once it's reachable.");
+  if (t.fallback) return V('alert', 'alert', 'Not a real score', "Featherless AI was unavailable or rate limited, so the Analyst defaulted this theme to 0. Run again once it's reachable.");
   const real = realThemes(R), neg = real.filter(x => x.score < 0), pos = real.filter(x => x.score > 0).reverse();
   if (t.score < 0) {
     const k = neg.indexOf(t) + 1, ba = `<span>${sgn(t.score)}</span>→<span>problem ${k} of ${neg.length}</span>`;
@@ -1031,7 +1031,7 @@ function renderAskIdle(){
 /* ---------- cost ---------- */
 // shop.py: page 1 returns 8 reviews, later pages 20, capped at MAX_PAGES searches a run.
 // Star-only reviews carry no text, so a real run can need more pages than this minimum.
-const FIRST_PAGE = 8, PAGE_SIZE = 20, MAX_PAGES = 30, GROQ_PER_RUN = 8, SERP_FREE = 250;
+const FIRST_PAGE = 8, PAGE_SIZE = 20, MAX_PAGES = 30, AI_PER_RUN = 8, SERP_FREE = 250;
 function renderCost(){
   const B = +$('#rBiz').value, Rn = +$('#rRuns').value, L = +$('#rLim').value, M = +$('#rMin').value;
   $('#oBiz').textContent = B; $('#oRuns').textContent = Rn; $('#oLim').textContent = fmt(L); $('#oMin').textContent = `${M} min`;
@@ -1041,7 +1041,7 @@ function renderCost(){
   $('#vHours').textContent = `${fmt(Math.round(hours))} hour${Math.round(hours) === 1 ? '' : 's'}`;
   const vs = $('#vSearch'); vs.textContent = fmt(searches); vs.className = searches > SERP_FREE ? 'txt-alert' : '';
   $('#vSearchNote').textContent = searches > SERP_FREE ? `SerpApi searches a month: over the ${SERP_FREE} free` : `SerpApi searches a month, of ${SERP_FREE} free`;
-  $('#vGroq').textContent = fmt(runs * GROQ_PER_RUN);
+  $('#vAi').textContent = fmt(runs * AI_PER_RUN);
 }
 $('#roiForm').addEventListener('input', renderCost);
 $('#roiForm').addEventListener('submit', e => e.preventDefault());
@@ -1050,7 +1050,7 @@ $('#roiForm').addEventListener('submit', e => e.preventDefault());
 function renderAll(typed){
   renderHero(); renderProof(); renderRail(); renderTool(); renderProgDone(); renderBriefing(typed); renderKpis();
   buildTrack(); renderTrack(); renderThemes(); renderDetail(typed ? true : undefined); resetStream(); renderAskIdle(); renderRecent(); renderMarket();
-  $('#footNote').textContent = state.example ? 'The example café and its reviews are fictional.' : 'Scores come from Groq. Quotes are real reviews that passed the Checker.';
+  $('#footNote').textContent = state.example ? 'The example café and its reviews are fictional.' : 'Scores come from Featherless AI. Quotes are real reviews that passed the Checker.';
 }
 function pickTheme(prevTheme){
   const R = cur()?.r; if (!R) return null;
@@ -1101,7 +1101,7 @@ function renderMarket(){
     : list.map(c => `<article class="mkt-card well">
         <header><h4>${esc(c.name)}</h4><span class="meta">${c.rating != null ? `${c.rating}★` : ''}${c.reviews_used != null ? ` · ${plural(c.reviews_used, 'review')} read` : c.review_count != null ? ` · ${plural(c.review_count, 'review')}` : ''}</span></header>
         ${c.address ? `<p class="addr">${esc(c.address)}</p>` : ''}
-        ${c.degraded ? `<p class="empty">Groq didn't summarise this competitor's reviews in this run.</p>` : `
+        ${c.degraded ? `<p class="empty">Featherless AI didn't summarise this competitor's reviews in this run.</p>` : `
         <h5>Customers praise</h5>${pts(c.strengths, 'good', 'Nothing stood out.')}
         <h5>Customers complain about</h5>${pts(c.weaknesses, 'bad', 'Nothing stood out.')}`}
       </article>`).join('');
@@ -1148,7 +1148,7 @@ async function runAnalysis(e){
   elapsedT = setInterval(() => { $('#lastRun').textContent = `running · ${Math.round((performance.now()-t0)/1000)} s`; }, 1000);
   $('#briefEyebrow').textContent = `Briefing · ${req.mode === 'week' ? `week ${req.run}` : `run ${req.run}`} · in progress`;
   $('#headline').classList.remove('txt-alert');
-  typeInto($('#headline'), req.mode === 'week' ? `Analysing week ${req.run} of ${req.label}. The Scorer and the Analyst make one Groq call per theme…` : `Reading reviews for ${req.label}. This usually takes one to two minutes…`, 14);
+  typeInto($('#headline'), req.mode === 'week' ? `Analysing week ${req.run} of ${req.label}. The Scorer and the Analyst make one AI call per theme…` : `Reading reviews for ${req.label}. This usually takes one to two minutes…`, 14);
   $('#hls').innerHTML = '';
   startProgress(req.mode);
   try {
@@ -1234,8 +1234,14 @@ $('#stack').querySelectorAll('.mcard').forEach(c => c.addEventListener('animatio
 /* boot */
 renderMonths(); renderLimit(); renderCost(); setStream(true);
 const last = LS.get(LKEY, null);
-if (last && HISTORY[last]?.runs?.length) { fillForm(HISTORY[last]); openRuns(last, hydrate(HISTORY[last].runs)); }
-else renderAll(false);
+try {
+  if (last && HISTORY[last]?.runs?.length) { fillForm(HISTORY[last]); openRuns(last, hydrate(HISTORY[last].runs)); }
+  else renderAll(false);
+} catch (err) {
+  // saved history from an older build can fail to restore; start clean rather than block the page
+  console.error('Could not restore saved runs', err);
+  try { renderAll(false); } catch {}
+}
 checkHealth();
 
 /* bento reveal: tiles below the fold start 28px low and settle as they enter. They stay fully visible throughout. */

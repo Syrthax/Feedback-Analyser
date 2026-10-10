@@ -19,7 +19,7 @@ class NothingToAnalyse(PipelineError):
 
 
 class UpstreamError(PipelineError, RuntimeError):
-    """An external service (SerpApi, Google Places, Groq) failed. Usually retriable."""
+    """An external service (SerpApi, Google Places, Featherless AI) failed. Usually retriable."""
     status = 502
 
 

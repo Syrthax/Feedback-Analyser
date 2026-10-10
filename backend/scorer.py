@@ -8,7 +8,8 @@ its logic for real-data integration:
      call_llm requires a system prompt and a user prompt, not one string.
   3. Sends every verified review in one prompt with no sampling. Tested
      against real week-1 data (604 reviews, ~52,000 tokens) and got a hard
-     Groq 413: our plan's rate limit is 8,000 tokens PER MINUTE, shared with
+     Groq 413 (the app ran on Groq then; that plan's limit was 8,000 tokens
+     PER MINUTE), shared with
      the Analyst's own calls in the same run -- so this silently returned []
      for any real week (call_llm's fallback swallows the error). Fixed by
      sampling the input down to a token budget that leaves headroom for the

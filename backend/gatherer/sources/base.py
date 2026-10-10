@@ -6,7 +6,7 @@ from ..schema import Review, OWN, MARKET
 # For sources that fetch with urllib. Python from the python.org macOS
 # installer ships without root certificates until "Install Certificates" is
 # run, so every HTTPS call failed with CERTIFICATE_VERIFY_FAILED outside
-# Docker. certifi (already installed with groq) carries its own bundle.
+# Docker. certifi (already installed with openai/httpx) carries its own bundle.
 try:
     import certifi
     SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())

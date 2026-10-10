@@ -1,73 +1,70 @@
-"""Shared Groq call helper: one function for all AI calls, with retries and a
-safe fallback when the model fails. Used by the Analyst and the Scorer.
+"""Shared Featherless AI call helper: one function for all AI calls, with
+retries and a safe fallback when the model fails. Used by the Scorer, the
+Analyst and the market comparison.
 
-openai/gpt-oss-120b is a reasoning model: by default it spends completion
-tokens on hidden chain-of-thought before writing an answer. With no cap, a
-long-enough prompt makes it burn the entire completion budget on reasoning
-and return empty content (finish_reason="length", reasoning_tokens roughly
-equal to completion_tokens) -- discovered when the Scorer's theme-discovery
-call returned "" for real data. reasoning_effort="low" plus an explicit
-max_tokens fixes it and also matters for cost: our Groq plan caps at 8,000
-tokens PER MINUTE, shared across every call in one run_week() execution, so
-low reasoning effort keeps each call's token usage well within budget.
+Featherless serves open-weights models behind an OpenAI-compatible API, so
+this talks to it with the openai SDK pointed at FEATHERLESS_BASE_URL. The model
+defaults to Qwen/Qwen2.5-72B-Instruct (needs Featherless' Premium plan, which
+allows models up to 72B); set FEATHERLESS_MODEL to use another one, e.g.
+Qwen/Qwen2.5-14B-Instruct on the Basic plan.
 
-Groq also enforces a separate, much bigger cap: 200,000 tokens PER DAY. Once
-that's exhausted, a 429's Retry-After can be tens of minutes (the time until
-midnight UTC-ish reset), not seconds -- discovered when a routine test
-appeared to hang for 4+ minutes. Blindly sleeping for whatever Retry-After
-says (the original fix here) is correct for the per-minute limit but a bad
-idea for the daily one: nothing recovers by waiting 25 minutes inside a
-single function call. See MAX_RATE_LIMIT_WAIT below."""
+Featherless doesn't meter tokens; it caps how many requests run at once, and
+a 72B model costs 4 of a plan's concurrency units. Every call here is made one
+after another, so a run never exceeds that on its own, but another client on
+the same key (or a second run) can: that comes back as a 429. A short wait
+usually clears it, so a RateLimitError gets its own wait, honouring the
+server's Retry-After header -- capped at MAX_RATE_LIMIT_WAIT, past which
+retrying inside one call won't help and we fail fast to the fallback."""
 
+import os
 import re
 import time
 
-from groq import Groq, RateLimitError
+from openai import OpenAI, RateLimitError
 
 from config import get_key
 from errors import ConfigError, UpstreamError
 
-MODEL = "openai/gpt-oss-120b"
+FEATHERLESS_BASE_URL = "https://api.featherless.ai/v1"
+DEFAULT_MODEL = "Qwen/Qwen2.5-72B-Instruct"
 MAX_TOKENS = 1500
-RATE_LIMIT_FALLBACK_WAIT = 20  # seconds, used when Groq doesn't send Retry-After
+REQUEST_TIMEOUT = 120  # seconds; a 72B model under load can take a while to start
+RATE_LIMIT_FALLBACK_WAIT = 10  # seconds, used when Featherless doesn't send Retry-After
 MAX_RATE_LIMIT_WAIT = 30  # never sleep longer than this even if Retry-After asks for more
 
 
+def model_name() -> str:
+    return os.environ.get("FEATHERLESS_MODEL") or DEFAULT_MODEL
+
+
 def call_llm(system_prompt: str, user_prompt: str, max_retries: int = 3, fallback: str | None = None) -> str:
-    """A single run_week() can make several sequential calls (one Scorer call
-    + one Analyst call per theme) against a Groq plan capped at 8,000 tokens
-    PER MINUTE -- so a 429 here is an expected, recoverable condition, not a
-    rare edge case. The generic exponential backoff below (max ~7s across 3
-    attempts) isn't enough to outlast a per-minute window resetting, so a
-    RateLimitError gets its own longer wait, honoring the server's
-    Retry-After header -- but capped at MAX_RATE_LIMIT_WAIT: if Groq asks for
-    longer than that, retrying won't help within this call (daily quota, not
-    a per-minute window), so fail fast to the fallback instead of hanging."""
-    # Only the Groq key: load_keys() demands every key, so a missing
+    """A 429 (too many concurrent requests on this key) is an expected,
+    recoverable condition here, so it gets its own longer wait instead of the
+    generic exponential backoff (max ~3s across 3 attempts)."""
+    # Only the Featherless key: load_keys() demands every key, so a missing
     # HINDSIGHT_API_KEY used to break every LLM call too. A missing key is a
     # config problem, not a flaky call -- raise it even when there's a
     # fallback, rather than returning six placeholder scores.
-    api_key = get_key("GROQ_API_KEY")
+    api_key = get_key("FEATHERLESS_API_KEY")
     if not api_key:
-        raise ConfigError("GROQ_API_KEY is not set -- see .env.example, or add it to keys.csv.")
-    client = Groq(api_key=api_key)
+        raise ConfigError("FEATHERLESS_API_KEY is not set -- see .env.example, or add it to keys.csv.")
+    client = OpenAI(api_key=api_key, base_url=FEATHERLESS_BASE_URL, timeout=REQUEST_TIMEOUT, max_retries=0)
+    model = model_name()
     last_error = None
 
     for attempt in range(max_retries):
         try:
             response = client.chat.completions.create(
-                model=MODEL,
+                model=model,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ],
                 temperature=0.3,
-                reasoning_effort="low",
                 max_tokens=MAX_TOKENS,
             )
             choice = response.choices[0]
-            # the reasoning model can burn its whole budget and return ""/None
-            # with a normal 200 -- that is a failed call, not an answer
+            # an empty reply with a normal 200 is a failed call, not an answer
             if not (choice.message.content or "").strip():
                 raise ValueError(f"empty completion (finish_reason={choice.finish_reason!r})")
             return choice.message.content
@@ -78,7 +75,7 @@ def call_llm(system_prompt: str, user_prompt: str, max_retries: int = 3, fallbac
             except ValueError:
                 wait = RATE_LIMIT_FALLBACK_WAIT
             if wait > MAX_RATE_LIMIT_WAIT:
-                break  # daily-quota-scale wait -- retrying here is futile, fail fast
+                break  # retrying within this call is futile, fail fast
             if attempt < max_retries - 1:
                 time.sleep(wait)
         except Exception as e:
@@ -88,7 +85,7 @@ def call_llm(system_prompt: str, user_prompt: str, max_retries: int = 3, fallbac
 
     if fallback is not None:
         return fallback
-    raise UpstreamError(f"Groq call failed after {max_retries} attempts: {last_error}")
+    raise UpstreamError(f"Featherless AI call failed after {max_retries} attempts: {last_error}")
 
 
 def strip_code_fences(text: str) -> str:

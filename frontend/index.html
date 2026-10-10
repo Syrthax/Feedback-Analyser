@@ -137,7 +137,7 @@
       <div>
         <p class="kicker" id="demoKicker">Workspace · connected to your API</p>
         <h2 class="h2">Analyse a business in <em>one run.</em></h2>
-        <p class="lede">Enter a name and a location. A run takes 60–120 seconds: it scrapes the reviews, then makes one Groq call per theme. Drag the timeline to compare earlier runs.</p>
+        <p class="lede">Enter a name and a location. A run takes 60–120 seconds: it scrapes the reviews, then makes one AI call per theme. Drag the timeline to compare earlier runs.</p>
       </div>
       <button class="btn" id="playBtn" disabled><span data-ic="play"></span><span>Replay runs</span></button>
     </div>
@@ -269,11 +269,11 @@
     </div>
   </section>
 
-  <!-- COST BENTO: inputs 5x2 | hours 7 · searches 4 | groq 3 -->
+  <!-- COST BENTO: inputs 5x2 | hours 7 · searches 4 | ai calls 3 -->
   <section class="sec wrap" id="roi">
     <div class="sec-head">
       <h2 class="h2">What a run <em>costs</em>, and what it saves.</h2>
-      <p class="lede">Every run spends real quota on SerpApi, Groq and Hindsight. Set your own numbers. A SerpApi search returns up to 20 reviews, and a run stops after 30 searches.</p>
+      <p class="lede">Every run spends real quota on SerpApi, Featherless AI and Hindsight. Set your own numbers. A SerpApi search returns up to 20 reviews, and a run stops after 30 searches.</p>
     </div>
     <div class="bento">
       <form class="inputs well tile r-in" id="roiForm">
@@ -287,7 +287,7 @@
         <p class="fine">Estimate only. Hours = reviews gathered ÷ 100 × minutes ÷ 60 × runs. A run stops after 30 SerpApi searches, so it gathers about 588 reviews with text at most. A max age stops it sooner.</p>
       </div>
       <div class="tile clay-sm r-money"><div class="o sm"><b id="vSearch">0</b><span id="vSearchNote">SerpApi searches a month</span></div></div>
-      <div class="tile clay-sm r-fix"><div class="o sm"><b id="vGroq">0</b><span>Groq calls a month: 1 to find themes, 1 per theme</span></div></div>
+      <div class="tile clay-sm r-fix"><div class="o sm"><b id="vAi">0</b><span>AI calls a month: 1 to find themes, 1 per theme</span></div></div>
     </div>
   </section>
 
@@ -301,7 +301,7 @@
       <div class="tile pl-cta">
         <div style="display:grid;gap:10px">
           <h3>Analyse your first business.</h3>
-          <p>A run takes 60–120 seconds and spends a few SerpApi searches and Groq calls.</p>
+          <p>A run takes 60–120 seconds and spends a few SerpApi searches and AI calls.</p>
         </div>
         <div class="closing">
           <a class="btn" href="#demo" data-focus-form><span data-ic="spark"></span>Open the workspace</a>
@@ -309,14 +309,14 @@
         </div>
       </div>
       <ol class="weeks-b">
-        <li class="wkstep tile clay-sm"><span class="blob">1</span><h3>Add your keys</h3><p>Copy <code>.env.example</code> to <code>.env</code> and set <code>GROQ_API_KEY</code>, <code>HINDSIGHT_API_KEY</code> and <code>SERPAPI_API_KEY</code>.</p></li>
+        <li class="wkstep tile clay-sm"><span class="blob">1</span><h3>Add your keys</h3><p>Copy <code>.env.example</code> to <code>.env</code> and set <code>FEATHERLESS_API_KEY</code>, <code>HINDSIGHT_API_KEY</code> and <code>SERPAPI_API_KEY</code>.</p></li>
         <li class="wkstep tile clay-sm"><span class="blob">2</span><h3>Start the API</h3><p><code>docker compose up</code>, or <code>uvicorn api:app --port 8000</code> from <code>backend/</code>. This page is served at the same address.</p></li>
         <li class="wkstep tile clay-sm"><span class="blob">3</span><h3>Analyse</h3><p>Enter a name and a location. Run it again later with the next run number and the Analyst compares against the earlier runs.</p></li>
       </ol>
     </div>
   </section>
 
-  <footer class="wrap"><div class="foot"><span>Feedback Analyser · memory by Hindsight</span><span id="footNote">Scores come from Groq. Quotes are real reviews that passed the Checker.</span></div></footer>
+  <footer class="wrap"><div class="foot"><span>Feedback Analyser · memory by Hindsight</span><span id="footNote">Scores come from Featherless AI. Quotes are real reviews that passed the Checker.</span></div></footer>
 </main>
 
 <div class="toast clay-sm" id="toast" role="status" aria-live="polite"><span class="blob" data-ic="check"></span><span id="toastText"></span></div>

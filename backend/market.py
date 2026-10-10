@@ -3,14 +3,14 @@ the Analyst can reason with.
 
 For a shop: find the busiest places of the same kind nearby (or take the names
 the caller gives), pull a small batch of each one's newest reviews, filter them
-through the Checker, and ask Groq once for each competitor's strengths and
+through the Checker, and ask the model once for each competitor's strengths and
 weaknesses. For a gathered week: the same summary over the market rows
 gatherer_config.json already collected for that week.
 
 Everything here is optional to the run: a competitor that can't be found or
 fetched becomes a warning, and a failed summary still lists the competitors.
-One Groq call covers every competitor, because the plan's 8,000 tokens per
-minute is shared with the Scorer and one Analyst call per theme."""
+One AI call covers every competitor, to keep a run to a handful of calls
+(the Scorer's, one Analyst call per theme, and this one)."""
 
 import json
 import random
@@ -92,7 +92,7 @@ def gather_competitors(competitors: list[dict], location: str, provider: str, si
 
 def summarise(business: str, groups: dict[str, list[dict]], meta: dict[str, dict] | None = None,
               warn=print) -> list[dict]:
-    """One Groq call: strengths and weaknesses for every competitor in groups
+    """One AI call: strengths and weaknesses for every competitor in groups
     (name -> verified reviews). meta adds address/rating/review_count per name.
     A failed call still returns every competitor, with empty lists and
     degraded=True, so the dashboard can say who was compared."""
@@ -119,7 +119,7 @@ def summarise(business: str, groups: dict[str, list[dict]], meta: dict[str, dict
         if not isinstance(items, list):
             raise TypeError("no competitors list")
     except (json.JSONDecodeError, TypeError, AttributeError):
-        warn("Couldn't summarise the competitors' reviews (Groq unavailable or an unusable reply); "
+        warn("Couldn't summarise the competitors' reviews (Featherless AI unavailable or an unusable reply); "
              "they're listed without strengths and weaknesses.")
         return out
 

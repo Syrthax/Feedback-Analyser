@@ -145,8 +145,8 @@
   <rect x="342" y="938" width="206" height="66" rx="10" class="card"/>
   <text x="445" y="964" text-anchor="middle" class="m" style="fill:#ffffff">summarise()</text>
   <text x="445" y="986" text-anchor="middle" class="s">strengths · weaknesses</text>
-  <rect x="506" y="944" width="38" height="16" rx="8" class="badge"/>
-  <text x="525" y="956" text-anchor="middle" class="badgeT">Groq</text>
+  <rect x="478" y="944" width="66" height="16" rx="8" class="badge"/>
+  <text x="511" y="956" text-anchor="middle" class="badgeT">Featherless</text>
 
   <rect x="342" y="1018" width="206" height="74" rx="10" class="card"/>
   <text x="445" y="1044" text-anchor="middle" class="m" style="fill:#ffffff">context_for_analyst()</text>
@@ -185,27 +185,27 @@
 
   <rect x="660" y="895" width="480" height="100" rx="40" class="main"/>
   <text x="900" y="928" text-anchor="middle" class="t" style="font-size:18px">Feedback Scorer</text>
-  <text x="900" y="952" text-anchor="middle" class="m" style="fill:#eaf5fc">scorer.py · one Groq call over a sample</text>
+  <text x="900" y="952" text-anchor="middle" class="m" style="fill:#eaf5fc">scorer.py · one AI call over a sample</text>
   <text x="900" y="976" text-anchor="middle" class="s" style="fill:#ffffff">→ themes [ { name, count, samples } ]</text>
-  <rect x="1082" y="905" width="38" height="16" rx="8" class="badge"/>
-  <text x="1101" y="917" text-anchor="middle" class="badgeT">Groq</text>
+  <rect x="1054" y="905" width="66" height="16" rx="8" class="badge"/>
+  <text x="1087" y="917" text-anchor="middle" class="badgeT">Featherless</text>
 
   <path d="M900,995 V1031" class="flow" marker-end="url(#arrow)"/>
 
   <rect x="660" y="1035" width="480" height="160" rx="40" class="main"/>
   <text x="900" y="1068" text-anchor="middle" class="t" style="font-size:18px">Analyst</text>
-  <text x="900" y="1092" text-anchor="middle" class="m" style="fill:#eaf5fc">analyst.py · one Groq call per theme</text>
+  <text x="900" y="1092" text-anchor="middle" class="m" style="fill:#eaf5fc">analyst.py · one AI call per theme</text>
   <text x="900" y="1116" text-anchor="middle" class="s" style="fill:#ffffff">theme + past runs (recall) + local-market context</text>
   <text x="900" y="1142" text-anchor="middle" class="t" style="font-size:14px">tells the reason for the score and future steps</text>
   <text x="900" y="1166" text-anchor="middle" class="m" style="fill:#eaf5fc">score −5..+5 · reasoning · next_step · vs_competitors</text>
-  <rect x="1082" y="1045" width="38" height="16" rx="8" class="badge"/>
-  <text x="1101" y="1057" text-anchor="middle" class="badgeT">Groq</text>
+  <rect x="1054" y="1045" width="66" height="16" rx="8" class="badge"/>
+  <text x="1087" y="1057" text-anchor="middle" class="badgeT">Featherless</text>
 
-  <!-- Groq -->
+  <!-- Featherless AI -->
   <path d="M900,1195 V1241" class="mem" marker-end="url(#arrowAmber)"/>
   <rect x="660" y="1245" width="480" height="84" rx="14" class="xt"/>
   <text x="680" y="1266" class="ext">EXTERNAL LLM</text>
-  <text x="900" y="1284" text-anchor="middle" class="t">Groq API — llm.py call_llm()</text>
+  <text x="900" y="1284" text-anchor="middle" class="t">Featherless AI — llm.py call_llm()</text>
   <text x="900" y="1306" text-anchor="middle" class="s">shared by Scorer, Analyst, market.summarise()</text>
   <text x="900" y="1323" text-anchor="middle" class="s">retries · Retry-After · rate-limit cap → "degraded" fallback</text>
 
@@ -265,9 +265,9 @@
   <path d="M950,1421 H1010" class="mem" marker-end="url(#arrowAmber)"/>
   <text x="1022" y="1426" class="s">LLM / memory call</text>
 
-  <rect x="1170" y="1413" width="38" height="16" rx="8" class="badge"/>
-  <text x="1189" y="1425" text-anchor="middle" class="badgeT">Groq</text>
-  <text x="1220" y="1426" class="s">uses Groq</text>
+  <rect x="1142" y="1413" width="66" height="16" rx="8" class="badge"/>
+  <text x="1175" y="1425" text-anchor="middle" class="badgeT">Featherless</text>
+  <text x="1220" y="1426" class="s">uses Featherless AI</text>
 
   <rect x="1320" y="1408" width="26" height="26" rx="13" fill="#2f5e46" stroke="#6cc59a"/>
   <rect x="1352" y="1408" width="26" height="26" rx="13" fill="#5e2f36" stroke="#e07a85"/>
