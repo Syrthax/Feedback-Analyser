@@ -17,6 +17,7 @@
 
 <div class="navbar wrap">
   <nav class="nav" aria-label="Page">
+    <div class="nav-glass" aria-hidden="true"></div>
     <a class="brand" href="#top"><span class="orb" aria-hidden="true"></span><span>Feedback Analyser</span></a>
     <div class="navlinks">
       <a href="#proof">What it answers</a>
@@ -322,5 +323,21 @@
 <div class="toast clay-sm" id="toast" role="status" aria-live="polite"><span class="blob" data-ic="check"></span><span id="toastText"></span></div>
 
 <script src="app.js"></script>
+<!-- FluidGlass navbar (fluid-glass.js). Pinned through esm.sh's deps= so every
+     package shares one React, three and R3F; drei is tree-shaken to what's used. -->
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client?deps=react@18.3.1",
+    "three": "https://esm.sh/three@0.168.0",
+    "@react-three/fiber": "https://esm.sh/@react-three/fiber@8.17.10?deps=react@18.3.1,react-dom@18.3.1,three@0.168.0",
+    "@react-three/drei": "https://esm.sh/@react-three/drei@9.114.0?deps=react@18.3.1,react-dom@18.3.1,three@0.168.0,@react-three/fiber@8.17.10&exports=useFBO,useGLTF,MeshTransmissionMaterial",
+    "maath": "https://esm.sh/maath@0.10.8?deps=three@0.168.0",
+    "htm": "https://esm.sh/htm@3.1.1"
+  }
+}
+</script>
+<script type="module" src="fluid-glass.js"></script>
 </body>
 </html>
